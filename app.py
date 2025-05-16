@@ -143,7 +143,7 @@ def trust():
 @app.route('/freedomindex')
 def freedomindex():
     """Render the freedom compass page."""
-    return render_template('freedomindex.html')
+    return render_template('freedom_compass.html')
 
 @app.route('/calculate', methods=['POST'])
 def calculate_freedom_match():

@@ -1,12 +1,11 @@
-{% extends "layout.html" %}
-
-{% block title %}Your Country Analysis{% endblock %}
-
+{% extends "layout.html" %} {% block title %}Your Country Analysis{% endblock %}
 {% block content %}
 <div class="content-section">
   <div class="page-header" id="overview">
     <h1>Your Country's Freedom Journey</h1>
-    <p class="lead">Analyze how civil liberties have evolved in your country from 2013 to 2024</p>
+    <p class="lead">
+      Analyze how civil liberties have evolved in your country from 2013 to 2024
+    </p>
   </div>
 
   <div class="row">
@@ -15,7 +14,9 @@
         <div class="card-body">
           <form id="country-search-form">
             <div class="mb-4">
-              <label for="country-search" class="form-label">Select Your Country</label>
+              <label for="country-search" class="form-label"
+                >Select Your Country</label
+              >
               <div class="input-group">
                 <select class="form-select" id="country-search" required>
                   <option value="">Choose a country...</option>
@@ -37,8 +38,13 @@
           <div id="score-display" class="text-center d-none">
             <h3 class="mb-4">Current Civil Liberties Score (2024)</h3>
             <div class="display-4 mb-3" id="current-score"></div>
-            <div class="progress mb-3" style="height: 25px;">
-              <div class="progress-bar" role="progressbar" id="score-bar" style="width: 0%"></div>
+            <div class="progress mb-3" style="height: 25px">
+              <div
+                class="progress-bar"
+                role="progressbar"
+                id="score-bar"
+                style="width: 0%"
+              ></div>
             </div>
             <div class="row mt-4">
               <div class="col-md-6">
@@ -50,10 +56,17 @@
                 <div class="alert alert-light">
                   <h5>Score Range</h5>
                   <ul class="list-unstyled">
-                    <li><span class="badge bg-success">55-60</span> Very high</li>
+                    <li>
+                      <span class="badge bg-success">55-60</span> Very high
+                    </li>
                     <li><span class="badge bg-info">50-54</span> High</li>
-                    <li><span class="badge bg-warning">45-49</span> Moderately high</li>
-                    <li><span class="badge bg-danger">&lt;45</span> Moderate</li>
+                    <li>
+                      <span class="badge bg-warning">45-49</span> Moderately
+                      high
+                    </li>
+                    <li>
+                      <span class="badge bg-danger">&lt;45</span> Moderate
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -77,103 +90,23 @@
           <h3>Understanding Civil Liberties Scores</h3>
           <p>The civil liberties score ranges from 0 to 60, evaluating:</p>
           <ul>
-            <li><strong>Freedom of Expression and Belief</strong> (max 16 points)</li>
+            <li>
+              <strong>Freedom of Expression and Belief</strong> (max 16 points)
+            </li>
             <li><strong>Associational Rights</strong> (max 12 points)</li>
             <li><strong>Rule of Law</strong> (max 16 points)</li>
             <li><strong>Personal Autonomy</strong> (max 16 points)</li>
           </ul>
-          <p>Higher scores indicate stronger protections for individual rights and freedoms.</p>
-          <hr>
-          <p class="text-muted"><small>Data source: Freedom House - Freedom in the World 2024</small></p>
-        </div>
-      </div>
-
-      <!-- Freedom Compass Section -->
-      <div class="card mt-4">
-        <div class="card-body">
-          <h3>Freedom Compass</h3>
-          <p class="lead">Find countries that align with your values using our interactive Freedom Compass.</p>
-          
-          <form id="freedom-weights-form">
-            <div class="row">
-              <div class="col-md-6 mb-4">
-                <div class="slider-container">
-                  <label class="form-label fw-bold">Freedom of Movement</label>
-                  <p class="text-muted small">The right to travel freely within a country, to leave and return to a country</p>
-                  <input type="range" class="form-range" id="weight1" name="weight1" min="0" max="100" value="25">
-                  <div class="slider-labels">
-                    <span>Not Important</span>
-                    <span>Very Important</span>
-                  </div>
-                  <div class="text-center">
-                    <span class="badge bg-primary" id="weight1-value">25%</span>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6 mb-4">
-                <div class="slider-container">
-                  <label class="form-label fw-bold">Property Rights</label>
-                  <p class="text-muted small">The right to own property and establish businesses without undue interference</p>
-                  <input type="range" class="form-range" id="weight2" name="weight2" min="0" max="100" value="25">
-                  <div class="slider-labels">
-                    <span>Not Important</span>
-                    <span>Very Important</span>
-                  </div>
-                  <div class="text-center">
-                    <span class="badge bg-primary" id="weight2-value">25%</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row">
-              <div class="col-md-6 mb-4">
-                <div class="slider-container">
-                  <label class="form-label fw-bold">Social Freedoms</label>
-                  <p class="text-muted small">Personal social freedoms including choice of marriage partners and family size</p>
-                  <input type="range" class="form-range" id="weight3" name="weight3" min="0" max="100" value="25">
-                  <div class="slider-labels">
-                    <span>Not Important</span>
-                    <span>Very Important</span>
-                  </div>
-                  <div class="text-center">
-                    <span class="badge bg-primary" id="weight3-value">25%</span>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6 mb-4">
-                <div class="slider-container">
-                  <label class="form-label fw-bold">Equality of Opportunity</label>
-                  <p class="text-muted small">Equal opportunities and freedom from economic exploitation</p>
-                  <input type="range" class="form-range" id="weight4" name="weight4" min="0" max="100" value="25">
-                  <div class="slider-labels">
-                    <span>Not Important</span>
-                    <span>Very Important</span>
-                  </div>
-                  <div class="text-center">
-                    <span class="badge bg-primary" id="weight4-value">25%</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="text-center mt-4">
-              <button type="submit" class="btn btn-primary btn-lg px-5">Find My Matches</button>
-            </div>
-          </form>
-          
-          <div class="loading mt-4" id="loading">
-            <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">Loading...</span>
-            </div>
-            <p class="mt-2">Finding your best country matches...</p>
-          </div>
-          
-          <div id="calc-summary" class="mb-4" style="display:none;"></div>
-          <div id="results" class="mt-5" style="display:none;">
-            <h3 class="text-center mb-4">Your Top Country Matches</h3>
-            <div class="row" id="results-content"></div>
-          </div>
+          <p>
+            Higher scores indicate stronger protections for individual rights
+            and freedoms.
+          </p>
+          <hr />
+          <p class="text-muted">
+            <small
+              >Data source: Freedom House - Freedom in the World 2024</small
+            >
+          </p>
         </div>
       </div>
     </div>
@@ -185,24 +118,24 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-.slider-container {
+  .slider-container {
     margin-bottom: 2rem;
-}
-.slider-labels {
+  }
+  .slider-labels {
     display: flex;
     justify-content: space-between;
     margin-top: 5px;
     font-size: 0.8rem;
     color: #6c757d;
-}
-.result-card {
+  }
+  .result-card {
     transition: all 0.3s ease;
-}
-.result-card:hover {
+  }
+  .result-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-}
-.freedom-score {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+  .freedom-score {
     width: 40px;
     height: 40px;
     display: inline-flex;
@@ -211,247 +144,273 @@
     border-radius: 50%;
     font-weight: bold;
     margin-right: 10px;
-}
-.score-1 { background-color: #f8d7da; color: #842029; }
-.score-2 { background-color: #f8d7da; color: #842029; }
-.score-3 { background-color: #fff3cd; color: #664d03; }
-.score-4 { background-color: #d1e7dd; color: #0f5132; }
-.score-5 { background-color: #d1e7dd; color: #0f5132; }
-.loading {
+  }
+  .score-1 {
+    background-color: #f8d7da;
+    color: #842029;
+  }
+  .score-2 {
+    background-color: #f8d7da;
+    color: #842029;
+  }
+  .score-3 {
+    background-color: #fff3cd;
+    color: #664d03;
+  }
+  .score-4 {
+    background-color: #d1e7dd;
+    color: #0f5132;
+  }
+  .score-5 {
+    background-color: #d1e7dd;
+    color: #0f5132;
+  }
+  .loading {
     display: none;
     text-align: center;
     margin: 2rem 0;
-}
-.spinner-border {
+  }
+  .spinner-border {
     width: 3rem;
     height: 3rem;
-}
-.chart-container {
+  }
+  .chart-container {
     height: 200px;
     margin-bottom: 1rem;
-}
+  }
 </style>
 
 <script>
-document.getElementById('country-search-form').addEventListener('submit', function(e) {
-  e.preventDefault();
-  const country = document.getElementById('country-search').value;
-  if (country) {
-    showLoading();
-    fetchCountryData(country);
+  document
+    .getElementById("country-search-form")
+    .addEventListener("submit", function (e) {
+      e.preventDefault();
+      const country = document.getElementById("country-search").value;
+      if (country) {
+        showLoading();
+        fetchCountryData(country);
+      }
+    });
+
+  function showLoading() {
+    document.getElementById("chart-loading").classList.remove("d-none");
+    document.getElementById("chart-error").classList.add("d-none");
+    document.getElementById("score-display").classList.add("d-none");
+    document.getElementById("time-series-chart").innerHTML = "";
   }
-});
 
-function showLoading() {
-  document.getElementById('chart-loading').classList.remove('d-none');
-  document.getElementById('chart-error').classList.add('d-none');
-  document.getElementById('score-display').classList.add('d-none');
-  document.getElementById('time-series-chart').innerHTML = '';
-}
-
-function showError(message) {
-  document.getElementById('chart-loading').classList.add('d-none');
-  document.getElementById('score-display').classList.add('d-none');
-  const errorDiv = document.getElementById('chart-error');
-  errorDiv.textContent = message;
-  errorDiv.classList.remove('d-none');
-}
-
-function getScoreColor(score) {
-  if (score >= 55) return 'success';
-  if (score >= 50) return 'info';
-  if (score >= 45) return 'warning';
-  return 'danger';
-}
-
-function getScoreInterpretation(score) {
-  if (score >= 55) {
-    return {
-      level: 'Very High',
-      text: 'Your country maintains excellent standards of civil liberties with strong protections for individual rights.',
-      color: 'success'
-    };
-  } else if (score >= 50) {
-    return {
-      level: 'High',
-      text: 'Your country demonstrates good protection of civil liberties, though there may be some areas for improvement.',
-      color: 'info'
-    };
-  } else if (score >= 45) {
-    return {
-      level: 'Moderately High',
-      text: 'Your country provides moderate protection of civil liberties, but there are notable areas that need strengthening.',
-      color: 'warning'
-    };
-  } else {
-    return {
-      level: 'Moderate',
-      text: 'Your country shows some concerning trends in civil liberties protection. Significant improvements are needed.',
-      color: 'danger'
-    };
+  function showError(message) {
+    document.getElementById("chart-loading").classList.add("d-none");
+    document.getElementById("score-display").classList.add("d-none");
+    const errorDiv = document.getElementById("chart-error");
+    errorDiv.textContent = message;
+    errorDiv.classList.remove("d-none");
   }
-}
 
-function displayScore(score) {
-  const scoreDisplay = document.getElementById('score-display');
-  const currentScore = document.getElementById('current-score');
-  const scoreBar = document.getElementById('score-bar');
-  const scoreInterpretationDiv = document.getElementById('score-interpretation');
-  
-  // Update score display
-  currentScore.textContent = score + '/60';
-  
-  // Update progress bar
-  const percentage = (score / 60) * 100;
-  scoreBar.style.width = percentage + '%';
-  scoreBar.className = `progress-bar bg-${getScoreColor(score)}`;
-  
-  // Update interpretation
-  const interpretation = getScoreInterpretation(score);
-  scoreInterpretationDiv.className = `alert alert-${interpretation.color}`;
-  scoreInterpretationDiv.innerHTML = `
+  function getScoreColor(score) {
+    if (score >= 55) return "success";
+    if (score >= 50) return "info";
+    if (score >= 45) return "warning";
+    return "danger";
+  }
+
+  function getScoreInterpretation(score) {
+    if (score >= 55) {
+      return {
+        level: "Very High",
+        text: "Your country maintains excellent standards of civil liberties with strong protections for individual rights.",
+        color: "success",
+      };
+    } else if (score >= 50) {
+      return {
+        level: "High",
+        text: "Your country demonstrates good protection of civil liberties, though there may be some areas for improvement.",
+        color: "info",
+      };
+    } else if (score >= 45) {
+      return {
+        level: "Moderately High",
+        text: "Your country provides moderate protection of civil liberties, but there are notable areas that need strengthening.",
+        color: "warning",
+      };
+    } else {
+      return {
+        level: "Moderate",
+        text: "Your country shows some concerning trends in civil liberties protection. Significant improvements are needed.",
+        color: "danger",
+      };
+    }
+  }
+
+  function displayScore(score) {
+    const scoreDisplay = document.getElementById("score-display");
+    const currentScore = document.getElementById("current-score");
+    const scoreBar = document.getElementById("score-bar");
+    const scoreInterpretationDiv = document.getElementById(
+      "score-interpretation"
+    );
+
+    // Update score display
+    currentScore.textContent = score + "/60";
+
+    // Update progress bar
+    const percentage = (score / 60) * 100;
+    scoreBar.style.width = percentage + "%";
+    scoreBar.className = `progress-bar bg-${getScoreColor(score)}`;
+
+    // Update interpretation
+    const interpretation = getScoreInterpretation(score);
+    scoreInterpretationDiv.className = `alert alert-${interpretation.color}`;
+    scoreInterpretationDiv.innerHTML = `
     <h5>${interpretation.level} Level</h5>
     <p class="mb-0">${interpretation.text}</p>
   `;
-  
-  // Show the score display
-  scoreDisplay.classList.remove('d-none');
-}
 
-function createTimeSeriesChart(data, country) {
-  // Sort data by year to ensure proper line connection
-  data.sort((a, b) => a.year - b.year);
-  
-  const years = data.map(d => d.year);
-  const scores = data.map(d => d.civil_liberties_score);
+    // Show the score display
+    scoreDisplay.classList.remove("d-none");
+  }
 
-  const trace = {
-    x: years,
-    y: scores,
-    type: 'scatter',
-    mode: 'lines+markers',
-    name: 'Civil Liberties Score',
-    line: {
-      color: '#3498db',
-      width: 2,
-      shape: 'linear'
-    },
-    marker: {
-      size: 8,
-      color: '#3498db',
-      symbol: 'circle',
+  function createTimeSeriesChart(data, country) {
+    // Sort data by year to ensure proper line connection
+    data.sort((a, b) => a.year - b.year);
+
+    const years = data.map((d) => d.year);
+    const scores = data.map((d) => d.civil_liberties_score);
+
+    const trace = {
+      x: years,
+      y: scores,
+      type: "scatter",
+      mode: "lines+markers",
+      name: "Civil Liberties Score",
       line: {
-        color: '#ffffff',
-        width: 1
-      }
-    },
-    text: scores.map(score => score.toFixed(1)),
-    textposition: 'top center',
-    hoverinfo: 'x+y',
-    hovertemplate: '<b>Year:</b> %{x}<br><b>Score:</b> %{y:.1f}<extra></extra>'
-  };
+        color: "#3498db",
+        width: 2,
+        shape: "linear",
+      },
+      marker: {
+        size: 8,
+        color: "#3498db",
+        symbol: "circle",
+        line: {
+          color: "#ffffff",
+          width: 1,
+        },
+      },
+      text: scores.map((score) => score.toFixed(1)),
+      textposition: "top center",
+      hoverinfo: "x+y",
+      hovertemplate:
+        "<b>Year:</b> %{x}<br><b>Score:</b> %{y:.1f}<extra></extra>",
+    };
 
-  const layout = {
-    title: {
-      text: `Civil Liberties Score Evolution: ${country} (2013-2024)`,
-      font: { size: 20 }
-    },
-    xaxis: {
-      title: 'Year',
-      tickmode: 'linear',
-      dtick: 1,
-      range: [2013, 2024],
-      tickformat: 'd',
-      gridcolor: '#e0e0e0',
-      showgrid: true
-    },
-    yaxis: {
-      title: 'Civil Liberties Score (0-60)',
-      range: [0, 60],
-      gridcolor: '#e0e0e0',
-      tickmode: 'linear',
-      dtick: 10,
-      showgrid: true
-    },
-    showlegend: false,
-    hovermode: 'closest',
-    plot_bgcolor: '#ffffff',
-    paper_bgcolor: '#ffffff',
-    margin: { t: 50, r: 30, b: 50, l: 60 }
-  };
+    const layout = {
+      title: {
+        text: `Civil Liberties Score Evolution: ${country} (2013-2024)`,
+        font: { size: 20 },
+      },
+      xaxis: {
+        title: "Year",
+        tickmode: "linear",
+        dtick: 1,
+        range: [2013, 2024],
+        tickformat: "d",
+        gridcolor: "#e0e0e0",
+        showgrid: true,
+      },
+      yaxis: {
+        title: "Civil Liberties Score (0-60)",
+        range: [0, 60],
+        gridcolor: "#e0e0e0",
+        tickmode: "linear",
+        dtick: 10,
+        showgrid: true,
+      },
+      showlegend: false,
+      hovermode: "closest",
+      plot_bgcolor: "#ffffff",
+      paper_bgcolor: "#ffffff",
+      margin: { t: 50, r: 30, b: 50, l: 60 },
+    };
 
-  const config = {
-    responsive: true,
-    displayModeBar: false
-  };
+    const config = {
+      responsive: true,
+      displayModeBar: false,
+    };
 
-  Plotly.newPlot('time-series-chart', [trace], layout, config);
-}
+    Plotly.newPlot("time-series-chart", [trace], layout, config);
+  }
 
-function fetchCountryData(country) {
-  fetch(`/get_country_history?country=${encodeURIComponent(country)}`)
-    .then(response => response.json())
-    .then(data => {
-      document.getElementById('chart-loading').classList.add('d-none');
-      if (data.error) {
-        showError(data.error);
-      } else {
-        // Create time series chart
-        createTimeSeriesChart(data.data, country);
-        // Display current score (2024)
-        const currentScore = data.data[data.data.length - 1].civil_liberties_score;
-        displayScore(currentScore);
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      showError('Failed to fetch data. Please try again.');
-    });
-}
-// Add Freedom Compass functionality
-document.addEventListener('DOMContentLoaded', function() {
+  function fetchCountryData(country) {
+    fetch(`/get_country_history?country=${encodeURIComponent(country)}`)
+      .then((response) => response.json())
+      .then((data) => {
+        document.getElementById("chart-loading").classList.add("d-none");
+        if (data.error) {
+          showError(data.error);
+        } else {
+          // Create time series chart
+          createTimeSeriesChart(data.data, country);
+          // Display current score (2024)
+          const currentScore =
+            data.data[data.data.length - 1].civil_liberties_score;
+          displayScore(currentScore);
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        showError("Failed to fetch data. Please try again.");
+      });
+  }
+  // Add Freedom Compass functionality
+  document.addEventListener("DOMContentLoaded", function () {
     // Update slider value displays
-    const sliders = ['weight1', 'weight2', 'weight3', 'weight4'];
-    sliders.forEach(slider => {
-        const input = document.getElementById(slider);
-        const valueDisplay = document.getElementById(`${slider}-value`);
-        
-        input.addEventListener('input', function() {
-            valueDisplay.textContent = `${this.value}%`;
-        });
+    const sliders = ["weight1", "weight2", "weight3", "weight4"];
+    sliders.forEach((slider) => {
+      const input = document.getElementById(slider);
+      const valueDisplay = document.getElementById(`${slider}-value`);
+
+      input.addEventListener("input", function () {
+        valueDisplay.textContent = `${this.value}%`;
+      });
     });
-    
+
     // Form submission
-    document.getElementById('freedom-weights-form').addEventListener('submit', async function(e) {
+    document
+      .getElementById("freedom-weights-form")
+      .addEventListener("submit", async function (e) {
         e.preventDefault();
-        
-        document.getElementById('loading').style.display = 'block';
-        document.getElementById('results').style.display = 'none';
-        
+
+        document.getElementById("loading").style.display = "block";
+        document.getElementById("results").style.display = "none";
+
         const weights = {
-            weight1: parseInt(document.getElementById('weight1').value),
-            weight2: parseInt(document.getElementById('weight2').value),
-            weight3: parseInt(document.getElementById('weight3').value),
-            weight4: parseInt(document.getElementById('weight4').value)
+          weight1: parseInt(document.getElementById("weight1").value),
+          weight2: parseInt(document.getElementById("weight2").value),
+          weight3: parseInt(document.getElementById("weight3").value),
+          weight4: parseInt(document.getElementById("weight4").value),
         };
 
         try {
-            const res = await fetch('/calculate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(weights)
-            });
+          const res = await fetch("/calculate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(weights),
+          });
 
-            const data = await res.json();
-            const resultsDiv = document.getElementById('results');
-            const content = document.getElementById('results-content');
-            const summaryDiv = document.getElementById('calc-summary');
+          const data = await res.json();
+          const resultsDiv = document.getElementById("results");
+          const content = document.getElementById("results-content");
+          const summaryDiv = document.getElementById("calc-summary");
 
-            if (data.error) {
-                content.innerHTML = '<div class="col-12"><div class="alert alert-danger">' + data.error + '</div></div>';
-                summaryDiv.style.display = 'none';
-            } else {
-                summaryDiv.innerHTML = `
+          if (data.error) {
+            content.innerHTML =
+              '<div class="col-12"><div class="alert alert-danger">' +
+              data.error +
+              "</div></div>";
+            summaryDiv.style.display = "none";
+          } else {
+            summaryDiv.innerHTML = `
                     <div class="card card-body bg-light border mb-3">
                         <h5 class="mb-2">Your Calculation</h5>
                         <div class="row">
@@ -476,18 +435,30 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     </div>
                 `;
-                summaryDiv.style.display = 'block';
+            summaryDiv.style.display = "block";
 
-                content.innerHTML = data.matches.map((m, index) =>
-                    `<div class="col-lg-4 col-md-6 mb-4">
-                        <div class="card result-card h-100 ${index === 0 ? 'border-primary' : ''}">
-                            <div class="card-header bg-${index === 0 ? 'primary text-white' : 'light'}">
-                                <h5 class="mb-0">${m.country} ${index === 0 ? '<span class="badge bg-warning text-dark ms-2">Best Match</span>' : ''}</h5>
+            content.innerHTML = data.matches
+              .map(
+                (m, index) =>
+                  `<div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card result-card h-100 ${
+                          index === 0 ? "border-primary" : ""
+                        }">
+                            <div class="card-header bg-${
+                              index === 0 ? "primary text-white" : "light"
+                            }">
+                                <h5 class="mb-0">${m.country} ${
+                    index === 0
+                      ? '<span class="badge bg-warning text-dark ms-2">Best Match</span>'
+                      : ""
+                  }</h5>
                             </div>
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <span>Match Score:</span>
-                                    <span class="badge bg-${getMatchColor(m.match_percentage)}">${m.match_percentage}%</span>
+                                    <span class="badge bg-${getMatchColor(
+                                      m.match_percentage
+                                    )}">${m.match_percentage}%</span>
                                 </div>
                                 <div class="chart-container">
                                     <canvas id="chart-${index}"></canvas>
@@ -495,87 +466,101 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <ul class="list-group list-group-flush">
                                     <li class="list-group-item d-flex justify-content-between align-items-center">
                                         Freedom of Movement
-                                        <span class="freedom-score score-${Math.round(m.scores.movement)}">${m.scores.movement}</span>
+                                        <span class="freedom-score score-${Math.round(
+                                          m.scores.movement
+                                        )}">${m.scores.movement}</span>
                                     </li>
                                     <li class="list-group-item d-flex justify-content-between align-items-center">
                                         Property Rights
-                                        <span class="freedom-score score-${Math.round(m.scores.property)}">${m.scores.property}</span>
+                                        <span class="freedom-score score-${Math.round(
+                                          m.scores.property
+                                        )}">${m.scores.property}</span>
                                     </li>
                                     <li class="list-group-item d-flex justify-content-between align-items-center">
                                         Social Freedoms
-                                        <span class="freedom-score score-${Math.round(m.scores.social)}">${m.scores.social}</span>
+                                        <span class="freedom-score score-${Math.round(
+                                          m.scores.social
+                                        )}">${m.scores.social}</span>
                                     </li>
                                     <li class="list-group-item d-flex justify-content-between align-items-center">
                                         Equality
-                                        <span class="freedom-score score-${Math.round(m.scores.equality)}">${m.scores.equality}</span>
+                                        <span class="freedom-score score-${Math.round(
+                                          m.scores.equality
+                                        )}">${m.scores.equality}</span>
                                     </li>
                                 </ul>
                             </div>
                         </div>
                     </div>`
-                ).join('');
-                
-                // Create radar charts
-                data.matches.forEach((m, index) => {
-                    const ctx = document.getElementById(`chart-${index}`).getContext('2d');
-                    new Chart(ctx, {
-                        type: 'radar',
-                        data: {
-                            labels: ['Movement', 'Property', 'Social', 'Equality'],
-                            datasets: [{
-                                label: 'Freedom Scores',
-                                data: [m.scores.movement, m.scores.property, m.scores.social, m.scores.equality],
-                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                                borderColor: 'rgb(54, 162, 235)',
-                                pointBackgroundColor: 'rgb(54, 162, 235)',
-                                pointBorderColor: '#fff',
-                                pointHoverBackgroundColor: '#fff',
-                                pointHoverBorderColor: 'rgb(54, 162, 235)'
-                            }]
-                        },
-                        options: {
-                            scales: {
-                                r: {
-                                    angleLines: {
-                                        display: true
-                                    },
-                                    suggestedMin: 0,
-                                    suggestedMax: 4
-                                }
-                            },
-                            maintainAspectRatio: false
-                        }
-                    });
-                });
-            }
-            
-            // Hide loading indicator and show results
-            document.getElementById('loading').style.display = 'none';
-            resultsDiv.style.display = 'block';
-            
-            // Scroll to results
-            resultsDiv.scrollIntoView({ behavior: 'smooth' });
-            
+              )
+              .join("");
+
+            // Create radar charts
+            data.matches.forEach((m, index) => {
+              const ctx = document
+                .getElementById(`chart-${index}`)
+                .getContext("2d");
+              new Chart(ctx, {
+                type: "radar",
+                data: {
+                  labels: ["Movement", "Property", "Social", "Equality"],
+                  datasets: [
+                    {
+                      label: "Freedom Scores",
+                      data: [
+                        m.scores.movement,
+                        m.scores.property,
+                        m.scores.social,
+                        m.scores.equality,
+                      ],
+                      backgroundColor: "rgba(54, 162, 235, 0.2)",
+                      borderColor: "rgb(54, 162, 235)",
+                      pointBackgroundColor: "rgb(54, 162, 235)",
+                      pointBorderColor: "#fff",
+                      pointHoverBackgroundColor: "#fff",
+                      pointHoverBorderColor: "rgb(54, 162, 235)",
+                    },
+                  ],
+                },
+                options: {
+                  scales: {
+                    r: {
+                      angleLines: {
+                        display: true,
+                      },
+                      suggestedMin: 0,
+                      suggestedMax: 4,
+                    },
+                  },
+                  maintainAspectRatio: false,
+                },
+              });
+            });
+          }
+
+          // Hide loading indicator and show results
+          document.getElementById("loading").style.display = "none";
+          resultsDiv.style.display = "block";
+
+          // Scroll to results
+          resultsDiv.scrollIntoView({ behavior: "smooth" });
         } catch (error) {
-            console.error('Error:', error);
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('results-content').innerHTML = 
-                '<div class="col-12"><div class="alert alert-danger">An error occurred while processing your request. Please try again.</div></div>';
-            document.getElementById('results').style.display = 'block';
+          console.error("Error:", error);
+          document.getElementById("loading").style.display = "none";
+          document.getElementById("results-content").innerHTML =
+            '<div class="col-12"><div class="alert alert-danger">An error occurred while processing your request. Please try again.</div></div>';
+          document.getElementById("results").style.display = "block";
         }
-    });
-    
+      });
+
     // Helper function to determine badge color based on match percentage
     function getMatchColor(percentage) {
-        if (percentage >= 90) return 'success';
-        if (percentage >= 70) return 'info';
-        if (percentage >= 50) return 'primary';
-        if (percentage >= 30) return 'warning';
-        return 'danger';
+      if (percentage >= 90) return "success";
+      if (percentage >= 70) return "info";
+      if (percentage >= 50) return "primary";
+      if (percentage >= 30) return "warning";
+      return "danger";
     }
-});
+  });
 </script>
 {% endblock %}
-
-
-
