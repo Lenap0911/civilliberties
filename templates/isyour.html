@@ -1,0 +1,255 @@
+{% extends "layout.html" %}
+
+{% block title %}Your Country Analysis{% endblock %}
+
+{% block content %}
+<div class="content-section">
+  <div class="page-header" id="overview">
+    <h1>Your Country's Freedom Journey</h1>
+    <p class="lead">Analyze how civil liberties have evolved in your country from 2013 to 2025</p>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <div class="card mb-4">
+        <div class="card-body">
+          <form id="country-search-form">
+            <div class="mb-4">
+              <label for="country-search" class="form-label">Select Your Country</label>
+              <div class="input-group">
+                <select class="form-select" id="country-search" required>
+                  <option value="">Choose a country...</option>
+                  {% for country in countries %}
+                  <option value="{{ country }}">{{ country }}</option>
+                  {% endfor %}
+                </select>
+                <button class="btn btn-primary" type="submit">Analyze</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Time Series Chart -->
+      <div class="card">
+        <div class="card-body">
+          <div id="time-series-chart"></div>
+          <div id="score-display" class="text-center d-none">
+            <h3 class="mb-4">Current Civil Liberties Score (2024)</h3>
+            <div class="display-4 mb-3" id="current-score"></div>
+            <div class="progress mb-3" style="height: 25px;">
+              <div class="progress-bar" role="progressbar" id="score-bar" style="width: 0%"></div>
+            </div>
+            <div class="row mt-4">
+              <div class="col-md-6">
+                <div class="alert" id="score-interpretation">
+                  <!-- Score interpretation will be inserted here -->
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="alert alert-light">
+                  <h5>Score Range</h5>
+                  <ul class="list-unstyled">
+                    <li><span class="badge bg-success">55-60</span> Very high</li>
+                    <li><span class="badge bg-info">50-54</span> High</li>
+                    <li><span class="badge bg-warning">45-49</span> Moderately high</li>
+                    <li><span class="badge bg-danger">&lt;45</span> Moderate</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="chart-loading" class="text-center d-none">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading data...</p>
+          </div>
+          <div id="chart-error" class="alert alert-danger d-none">
+            Error loading data. Please try again.
+          </div>
+        </div>
+      </div>
+
+      <!-- Information Card -->
+      <div class="card mt-4">
+        <div class="card-body">
+          <h3>Understanding Civil Liberties Scores</h3>
+          <p>The civil liberties score ranges from 0 to 60, evaluating:</p>
+          <ul>
+            <li><strong>Freedom of Expression and Belief</strong> (max 16 points)</li>
+            <li><strong>Associational Rights</strong> (max 12 points)</li>
+            <li><strong>Rule of Law</strong> (max 16 points)</li>
+            <li><strong>Personal Autonomy</strong> (max 16 points)</li>
+          </ul>
+          <p>Higher scores indicate stronger protections for individual rights and freedoms.</p>
+          <hr>
+          <p class="text-muted"><small>Data source: Freedom House - Freedom in the World 2024</small></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Plotly.js -->
+<script src="https://cdn.plot.ly/plotly-2.29.1.min.js"></script>
+
+<script>
+document.getElementById('country-search-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const country = document.getElementById('country-search').value;
+  if (country) {
+    showLoading();
+    fetchCountryData(country);
+  }
+});
+
+function showLoading() {
+  document.getElementById('chart-loading').classList.remove('d-none');
+  document.getElementById('chart-error').classList.add('d-none');
+  document.getElementById('score-display').classList.add('d-none');
+  document.getElementById('time-series-chart').innerHTML = '';
+}
+
+function showError(message) {
+  document.getElementById('chart-loading').classList.add('d-none');
+  document.getElementById('score-display').classList.add('d-none');
+  const errorDiv = document.getElementById('chart-error');
+  errorDiv.textContent = message;
+  errorDiv.classList.remove('d-none');
+}
+
+function getScoreColor(score) {
+  if (score >= 55) return 'success';
+  if (score >= 50) return 'info';
+  if (score >= 45) return 'warning';
+  return 'danger';
+}
+
+function getScoreInterpretation(score) {
+  if (score >= 55) {
+    return {
+      level: 'Very High',
+      text: 'Your country maintains excellent standards of civil liberties with strong protections for individual rights.',
+      color: 'success'
+    };
+  } else if (score >= 50) {
+    return {
+      level: 'High',
+      text: 'Your country demonstrates good protection of civil liberties, though there may be some areas for improvement.',
+      color: 'info'
+    };
+  } else if (score >= 45) {
+    return {
+      level: 'Moderately High',
+      text: 'Your country provides moderate protection of civil liberties, but there are notable areas that need strengthening.',
+      color: 'warning'
+    };
+  } else {
+    return {
+      level: 'Moderate',
+      text: 'Your country shows some concerning trends in civil liberties protection. Significant improvements are needed.',
+      color: 'danger'
+    };
+  }
+}
+
+function displayScore(score) {
+  const scoreDisplay = document.getElementById('score-display');
+  const currentScore = document.getElementById('current-score');
+  const scoreBar = document.getElementById('score-bar');
+  const scoreInterpretationDiv = document.getElementById('score-interpretation');
+  
+  // Update score display
+  currentScore.textContent = score + '/60';
+  
+  // Update progress bar
+  const percentage = (score / 60) * 100;
+  scoreBar.style.width = percentage + '%';
+  scoreBar.className = `progress-bar bg-${getScoreColor(score)}`;
+  
+  // Update interpretation
+  const interpretation = getScoreInterpretation(score);
+  scoreInterpretationDiv.className = `alert alert-${interpretation.color}`;
+  scoreInterpretationDiv.innerHTML = `
+    <h5>${interpretation.level} Level</h5>
+    <p class="mb-0">${interpretation.text}</p>
+  `;
+  
+  // Show the score display
+  scoreDisplay.classList.remove('d-none');
+}
+
+function createTimeSeriesChart(data, country) {
+  const years = data.map(d => d.year);
+  const scores = data.map(d => d.civil_liberties_score);
+
+  const trace = {
+    x: years,
+    y: scores,
+    type: 'scatter',
+    mode: 'lines+markers',
+    name: 'Civil Liberties Score',
+    line: {
+      color: '#3498db',
+      width: 3
+    },
+    marker: {
+      size: 8,
+      color: '#3498db'
+    }
+  };
+
+  const layout = {
+    title: {
+      text: `Civil Liberties Score Evolution: ${country}`,
+      font: { size: 20 }
+    },
+    xaxis: {
+      title: 'Year',
+      tickmode: 'linear',
+      dtick: 1
+    },
+    yaxis: {
+      title: 'Civil Liberties Score (0-60)',
+      range: [0, 60]
+    },
+    showlegend: false,
+    hovermode: 'x unified',
+    plot_bgcolor: '#f8f9fa',
+    paper_bgcolor: '#ffffff'
+  };
+
+  const config = {
+    responsive: true,
+    displayModeBar: false
+  };
+
+  Plotly.newPlot('time-series-chart', [trace], layout, config);
+}
+
+function fetchCountryData(country) {
+  fetch(`/get_country_history?country=${encodeURIComponent(country)}`)
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('chart-loading').classList.add('d-none');
+      if (data.error) {
+        showError(data.error);
+      } else {
+        // Create time series chart
+        createTimeSeriesChart(data.data, country);
+        // Display current score (2024)
+        const currentScore = data.data[data.data.length - 1].civil_liberties_score;
+        displayScore(currentScore);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      showError('Failed to fetch data. Please try again.');
+    });
+}
+</script>
+{% endblock %}
+
+
+

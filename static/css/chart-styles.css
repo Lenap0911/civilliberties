@@ -1,0 +1,27 @@
+.chart-wrapper {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.chart-title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+    text-align: center;
+}
+
+.chart-legend {
+    margin-top: 1rem;
+    padding: 10px;
+    border-top: 1px solid #eee;
+}
+
+.chart-tooltip {
+    background: rgba(255,255,255,0.95);
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}

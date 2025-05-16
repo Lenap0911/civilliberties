@@ -1,0 +1,104 @@
+{% extends "layout.html" %}
+
+{% block title %}Trust Levels Analysis{% endblock %}
+
+{% block content %}
+<div class="content-section">
+  <div class="page-header">
+    <h1>Trust Levels Analysis</h1>
+    <p class="lead">Compare trust in legal systems with civil liberties across EU member states</p>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body text-center">
+          <h2 class="card-title">Trust in Legal Systems vs Civil Liberties</h2>
+          <div class="mb-4">
+            <img src="{{ url_for('static', filename='charts/trust_freedom_deviation.png') }}" 
+                 alt="Trust and Civil Liberties Distribution in EU Countries" 
+                 class="img-fluid rounded shadow">
+          </div>
+          <p class="text-muted">Comparison of trust levels in legal systems and civil liberties scores across EU member states.</p>
+          <p class="text-muted small">Data sources: Trust data from ESS11 (2024); Civil Liberties scores from Freedom House (2024).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h3 class="card-title text-center">Detailed Country Data</h3>
+          <p class="text-muted text-center">Trust scores (0-10) from ESS11 survey responses, combined with Civil Liberties scores from Freedom House.</p>
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Country</th>
+                  <th>Trust in Legal System (0-10)</th>
+                  <th>Civil Liberties Score</th>
+                  <th>Survey Responses</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in trust_data %}
+                <tr>
+                  <td>{{ row['country_name'] }}</td>
+                  <td>{{ "%.2f"|format(row['trust_score']) }}</td>
+                  <td>{{ "%.2f"|format(row['civil_liberties_score']) if row['civil_liberties_score'] else 'N/A' }}</td>
+                  <td>{{ row['response_count'] }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h3 class="card-title">Understanding the Scores</h3>
+          <div class="row">
+            <div class="col-md-6">
+              <h4>Trust in Legal System</h4>
+              <p>Measured on a scale of 0-10, where:</p>
+              <ul>
+                <li>0 = No trust at all</li>
+                <li>10 = Complete trust</li>
+              </ul>
+              <p>Based on responses to the European Social Survey question about trust in the legal system.</p>
+            </div>
+            <div class="col-md-6">
+              <h4>Civil Liberties Score</h4>
+              <p>Based on Freedom House's assessment of:</p>
+              <ul>
+                <li>Freedom of Expression</li>
+                <li>Religious Freedom</li>
+                <li>Freedom of Assembly</li>
+                <li>Rule of Law</li>
+                <li>Personal Autonomy</li>
+                <li>Individual Rights</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+
+

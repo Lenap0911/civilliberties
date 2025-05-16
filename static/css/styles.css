@@ -1,0 +1,44 @@
+.card {
+    height: 100%;
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.text-center {
+    margin-top: auto;
+}
+
+.btn-primary {
+    width: 100%;
+    max-width: 200px;
+    margin: 0 auto;
+}
+
+.modal-header {
+    border-bottom: none;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+#main-features .card {
+    transition: transform 0.2s;
+}
+
+#main-features .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.chart-container {
+    margin-top: 2rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}

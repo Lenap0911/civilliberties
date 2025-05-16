@@ -1,0 +1,156 @@
+from flask import Flask, render_template_string, request, jsonify
+import pandas as pd
+import os
+
+app = Flask(__name__)
+
+TEMPLATE = """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Freedom Compass</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container py-5">
+    <h1>Freedom Compass</h1>
+    <p class="lead">Assign weights to rights and freedoms to discover your best-matching EU countries.</p>
+    <form id="freedom-weights-form">
+        {% for label, name in weights %}
+        <div class="mb-3">
+            <label class="form-label">{{ label }}</label>
+            <div class="input-group">
+                <input type="number" class="form-control" id="{{ name }}" name="{{ name }}" min="0" max="100" value="25" required>
+                <span class="input-group-text">%</span>
+            </div>
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Find Matching Countries</button>
+    </form>
+
+    <div id="results" class="mt-5" style="display:none;">
+        <h3>Top Matches</h3>
+        <div id="results-content"></div>
+    </div>
+</div>
+
+<script>
+document.getElementById('freedom-weights-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const weights = {
+        weight1: parseInt(document.getElementById('weight1').value),
+        weight2: parseInt(document.getElementById('weight2').value),
+        weight3: parseInt(document.getElementById('weight3').value),
+        weight4: parseInt(document.getElementById('weight4').value)
+    };
+
+    const res = await fetch('/calculate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(weights)
+    });
+
+    const data = await res.json();
+    const resultsDiv = document.getElementById('results');
+    const content = document.getElementById('results-content');
+
+    if (data.error) {
+        content.innerHTML = '<div class="alert alert-danger">' + data.error + '</div>';
+    } else {
+        content.innerHTML = data.matches.map(m =>
+            `<div class="card mb-2 p-3">
+                <h5>${m.country} <small class="text-muted">Match: ${m.match_percentage}%</small></h5>
+                <ul>
+                  <li>Freedom of Movement: ${m.scores.movement}</li>
+                  <li>Property Rights: ${m.scores.property}</li>
+                  <li>Social Freedoms: ${m.scores.social}</li>
+                  <li>Equality: ${m.scores.equality}</li>
+                </ul>
+            </div>`).join('');
+    }
+    resultsDiv.style.display = 'block';
+});
+</script>
+</body>
+</html>
+"""
+
+EU_COUNTRIES = {
+    "Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus", "Czech Republic", "Denmark",
+    "Estonia", "Finland", "France", "Germany", "Greece", "Hungary", "Ireland", "Italy",
+    "Latvia", "Lithuania", "Luxembourg", "Malta", "Netherlands", "Poland", "Portugal",
+    "Romania", "Slovakia", "Slovenia", "Spain", "Sweden"
+}
+
+@app.route('/')
+def index():
+    weights = [
+        ("Freedom of Movement", "weight1"),
+        ("Property Rights & Business Freedom", "weight2"),
+        ("Personal Social Freedoms", "weight3"),
+        ("Equality of Opportunity", "weight4")
+    ]
+    return render_template_string(TEMPLATE, weights=weights)
+
+@app.route('/calculate', methods=['POST'])
+def calculate():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Invalid input."}), 400
+
+        total = sum(data.values())
+        if total == 0:
+            return jsonify({"error": "Total weight cannot be zero."}), 400
+
+        weights = {
+            "G1": data['weight1'] / total,
+            "G2": data['weight2'] / total,
+            "G3": data['weight3'] / total,
+            "G4": data['weight4'] / total,
+        }
+
+        # Load and filter CSV
+        if not os.path.exists("FIW2024.csv"):
+            return jsonify({"error": "FIW2024.csv not found."}), 500
+
+        df = pd.read_csv("FIW2024.csv")
+
+        df = df[(df["Edition"] == 2024) & (df["Country/Territory"].isin(EU_COUNTRIES))]
+
+        for g in ["G1", "G2", "G3", "G4"]:
+            if g not in df.columns:
+                return jsonify({"error": f"Missing column {g} in CSV."}), 500
+
+        df["score"] = (
+            df["G1"] * weights["G1"] +
+            df["G2"] * weights["G2"] +
+            df["G3"] * weights["G3"] +
+            df["G4"] * weights["G4"]
+        )
+
+        top = df.sort_values("score", ascending=False).head(3)
+
+        max_score = top["score"].max()
+
+        results = []
+        for _, row in top.iterrows():
+            results.append({
+                "country": row["Country/Territory"],
+                "match_percentage": round((row["score"] / max_score) * 100, 1),
+                "scores": {
+                    "movement": row["G1"],
+                    "property": row["G2"],
+                    "social": row["G3"],
+                    "equality": row["G4"]
+                }
+            })
+
+        return jsonify({"matches": results})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True)

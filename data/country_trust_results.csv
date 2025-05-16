@@ -1,0 +1,27 @@
+code,avg_trust,response_count,country
+AT,7.19,2354,Austria
+BE,6.12,1594,Belgium
+CH,8.98,1384,Switzerland
+CY,6.07,685,Cyprus
+DE,7.0,2420,Germany
+ES,6.37,1844,Spain
+FI,7.78,1563,Finland
+FR,5.4,1771,France
+GB,7.76,1684,United Kingdom
+GR,5.75,2757,Greece
+HR,4.86,1563,Croatia
+HU,6.84,2118,Hungary
+IE,7.87,2017,Ireland
+IS,6.99,842,Iceland
+IT,7.12,2865,Italy
+LT,6.99,1365,Lithuania
+NL,7.78,1695,Netherlands
+NO,8.23,1337,Norway
+PL,7.07,1442,Poland
+PT,7.46,1373,Portugal
+RS,9.8,1563,Serbia
+SE,8.06,1230,Sweden
+SI,6.83,1248,Slovenia
+SK,5.63,1442,Slovakia
+
+#this file was created for the purpose of data processing optimization, as the original ESS11.cvs is extremely large and it was causing issues rendering data. 

@@ -1,0 +1,425 @@
+{% extends "layout.html" %}
+
+{% block title %}Exploring Civil Liberties in EU{% endblock %}
+
+{% block content %}
+<div class="content-section">
+  <div class="page-header" id="overview">
+    <h1>Exploring Civil Liberties in EU</h1>
+    <p class="lead">Explore civil liberties scores across European Union member states</p>
+  </div>
+
+  <!-- Interactive Europe Map Section -->
+  <div class="row mb-4">
+    <div class="col-lg-8 mx-auto">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="card-title">EU Civil Liberties Map</h2>
+          <div class="map-container">
+            <div id="europe-map"></div>
+            <div class="text-center p-5" id="map-loading">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading map...</span>
+              </div>
+              <p class="mt-2">Loading map...</p>
+            </div>
+          </div>
+          <div id="map-info-panel" class="mt-3 p-3 bg-light rounded">
+            <p class="mb-0">Click on any EU country to view its civil liberties score and details</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Country Details Modal -->
+  <div class="modal fade" id="countryDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Civil Liberties Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Content will be dynamically inserted here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4" id="main-features">
+    <div class="col-md-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h3>Trust Levels</h3>
+          <p class="card-text">Analyze trust in legal systems across EU member states. Compare countries and identify trends in institutional confidence.</p>
+          <div class="text-center">
+            <a href="/trust" class="btn btn-primary">Explore Trust Data</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h3>Freedom Compass Tool</h3>
+          <p class="card-text">The Freedom Compass analyzes your priorities across personal freedoms and rights categories to instantly match you with the top three countries that best align with your values.</p>
+          <div class="text-center">
+            <a href="/freedomindex" class="btn btn-primary">Get started</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h3>Country Analysis</h3>
+          <p class="card-text">Explore detailed breakdowns of civil liberties components and compare them across different EU member states.</p>
+          <div class="text-center">
+            <a href="/isyour" class="btn btn-primary">Analyze Countries</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h3>About Civil Liberties</h3>
+          <p>The civil liberties score (0-60) measures the degree of freedom and individual rights in a country.</p>
+          <p>Higher scores indicate:</p>
+          <ul>
+            <li>Greater freedom of expression</li>
+            <li>Stronger rule of law</li>
+            <li>Better protection of individual rights</li>
+            <li>More personal and associational freedoms</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h3>Data Sources</h3>
+          <p>Our analysis is based on data from:</p>
+          <ul>
+            <li>Freedom House. (2024). <em>Freedom in the World 2024</em>. <a href="https://freedomhouse.org/report/freedom-world/2024">https://freedomhouse.org/report/freedom-world/2024</a></li>
+            <li>European Social Survey European Research Infrastructure (ESS ERIC). (2024). <em>ESS round 11 - 2023. Social inequalities in health, Gender in contemporary Europe</em>. Sikt - Norwegian Agency for Shared Services in Education and Research. <a href="https://doi.org/10.21338/ess11-2023">https://doi.org/10.21338/ess11-2023</a></li>
+          </ul>
+          <p class="mt-3">Freedom House provides a comprehensive assessment of civil liberties worldwide, while the ESS offers high-quality comparative data on social attitudes across Europe.</p>
+        </div>
+      </div>
+    </div>
+
+<!-- Add required scripts -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="{{ url_for('static', filename='js/jquery.vmap.europe.js') }}"></script>
+<script src="https://cdn.plot.ly/plotly-2.29.1.min.js"></script>
+<script type="text/javascript">
+  // Get civil liberties data from Flask
+  var civilLibertiesData = JSON.parse('{{ civil_liberties_data|tojson|safe }}');
+  console.log('Civil Liberties Data:', civilLibertiesData);
+
+  function getCivilLibertiesDescription(score) {
+    if (score === "N/A") return "No data available";
+    if (score >= 53) return "Very high level of civil liberties";
+    if (score >= 45) return "High level of civil liberties";
+    if (score >= 37) return "Moderate level of civil liberties";
+    return "Low level of civil liberties";
+  }
+
+  function getColor(score) {
+    if (score >= 53) return '#1a9850';  // Dark green for very high scores
+    if (score >= 45) return '#91cf60';  // Light green for high scores
+    if (score >= 37) return '#d9ef8b';  // Yellow-green for moderate scores
+  }
+
+  function createPieChart(countryData) {
+    var data = [{
+      values: [
+        countryData.freedom_expression_belief || 0,
+        countryData.associational_rights || 0,
+        countryData.rule_of_law || 0,
+        countryData.personal_autonomy || 0
+      ],
+      labels: [
+        'Freedom of Expression & Belief',
+        'Associational Rights',
+        'Rule of Law',
+        'Personal Autonomy'
+      ],
+      type: 'pie',
+      hole: 0.4,
+      marker: {
+        colors: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728']
+      }
+    }];
+
+    var layout = {
+      title: {
+        text: 'Civil Liberties Components',
+        font: { size: 20 }
+      },
+      height: 400,
+      showlegend: true,
+      legend: {
+        orientation: 'h',
+        y: -0.2
+      },
+      margin: { t: 50, l: 0, r: 0, b: 0 }
+    };
+
+    var config = {
+      responsive: true,
+      displayModeBar: false
+    };
+
+    Plotly.newPlot('pieChart', data, layout, config);
+  }
+
+  // Initialize map when document is ready
+  $(document).ready(function() {
+    const width = document.querySelector('.map-container').offsetWidth;
+    const height = 500;
+    // Color scale for civil liberties scores
+    const colorScale = d3.scaleSequential(d3.interpolateRdYlBu)
+      .domain([0, 60]);
+
+    // Create legend
+    const legendWidth = 200;
+    const legendHeight = 20;
+
+    const legend = d3.select('.map-container')
+      .append('div')
+      .attr('class', 'legend')
+      .style('position', 'absolute')
+      .style('bottom', '20px')
+      .style('right', '20px')
+      .style('background', 'rgba(255,255,255,0.9)')
+      .style('padding', '10px')
+      .style('border-radius', '5px')
+      .style('box-shadow', '0 2px 4px rgba(0,0,0,0.1)');
+
+    const legendSvg = legend.append('svg')
+      .attr('width', legendWidth)
+      .attr('height', legendHeight + 30);
+
+    const defs = legendSvg.append('defs');
+    const linearGradient = defs.append('linearGradient')
+      .attr('id', 'legend-gradient')
+      .attr('x1', '0%')
+      .attr('y1', '0%')
+      .attr('x2', '100%')
+      .attr('y2', '0%');
+
+    linearGradient.selectAll('stop')
+      .data(d3.range(0, 61, 20))
+      .enter()
+      .append('stop')
+      .attr('offset', d => `${(d / 60) * 100}%`)
+      .attr('stop-color', d => colorScale(d));
+
+    // Add legend rectangle
+    legendSvg.append('rect')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('width', legendWidth)
+      .attr('height', legendHeight)
+      .style('fill', 'url(#legend-gradient)');
+
+    // Add legend labels
+    legendSvg.append('text')
+      .attr('x', 0)
+      .attr('y', legendHeight + 15)
+      .style('font-size', '12px')
+      .text('0');
+
+    legendSvg.append('text')
+      .attr('x', legendWidth / 2)
+      .attr('y', legendHeight + 15)
+      .style('font-size', '12px')
+      .style('text-anchor', 'middle')
+      .text('30');
+
+    legendSvg.append('text')
+      .attr('x', legendWidth)
+      .attr('y', legendHeight + 15)
+      .style('font-size', '12px')
+      .style('text-anchor', 'end')
+      .text('60');
+
+    legendSvg.append('text')
+      .attr('x', legendWidth / 2)
+      .attr('y', legendHeight + 28)
+      .style('font-size', '10px')
+      .style('text-anchor', 'middle')
+      .text('Civil Liberties Score');
+
+    // Create tooltip
+    const tooltip = d3.select('body').append('div')
+      .attr('class', 'map-tooltip')
+      .style('visibility', 'hidden');
+
+    // Create SVG with zoom behavior
+    const svg = d3.select('#europe-map')
+      .append('svg')
+      .attr('width', width)
+      .attr('height', height)
+      .style('background', '#f8f9fa');
+
+    // Create a container group for zoom/pan
+    const g = svg.append('g');
+
+    // Add zoom behavior
+    const zoom = d3.zoom()
+      .scaleExtent([1, 8])
+      .on('zoom', (event) => {
+        g.attr('transform', event.transform);
+        // Scale stroke width inversely with zoom to maintain consistent line thickness
+        g.selectAll('path').style('stroke-width', `${0.5 / event.transform.k}px`);
+      });
+
+    svg.call(zoom);
+
+    // Create projection
+    const projection = d3.geoMercator()
+      .center([15, 52])
+      .scale(width/1.5)
+      .translate([width / 2, height / 2]);
+
+    // Create path generator
+    const path = d3.geoPath().projection(projection);
+
+    // Load Europe GeoJSON
+    d3.json('https://raw.githubusercontent.com/leakyMirror/map-of-europe/master/GeoJSON/europe.geojson')
+      .then(function(europe) {
+        // Draw the map
+        g.selectAll('path')
+          .data(europe.features)
+          .enter().append('path')
+          .attr('d', path)
+          .attr('class', d => {
+            const countryCode = d.properties.ISO2;
+            return civilLibertiesData[countryCode] ? 'country eu-member' : 'country';
+          })
+          .attr('fill', function(d) {
+            const countryCode = d.properties.ISO2;
+            if (civilLibertiesData[countryCode]) {
+              return colorScale(civilLibertiesData[countryCode].civil_liberties_score);
+            }
+            return '#e4e4e4';
+          })
+          .style('stroke', '#ffffff')
+          .style('stroke-width', '0.5')
+          .style('transition', 'fill 0.3s ease')
+          .on('mousemove', function(event, d) {
+            const countryCode = d.properties.ISO2;
+            const countryData = civilLibertiesData[countryCode];
+            const countryName = d.properties.NAME;
+            
+            // Only process EU countries
+            if (countryData) {
+              // Highlight the country with brighter version of its score color
+              d3.select(this)
+                .style('fill', () => {
+                  const color = d3.color(colorScale(countryData.civil_liberties_score));
+                  return color.brighter(0.3);
+                })
+                .style('cursor', 'pointer')
+                .style('stroke-width', '1.5px');
+
+              // Show country name tooltip
+              tooltip
+                .style('visibility', 'visible')
+                .style('left', (event.pageX + 10) + 'px')
+                .style('top', (event.pageY - 10) + 'px')
+                .text(countryName);
+
+              // Bring country to front
+              this.parentNode.appendChild(this);
+            }
+          })
+          .on('mouseout', function(event, d) {
+            const countryCode = d.properties.ISO2;
+            const countryData = civilLibertiesData[countryCode];
+            
+            // Reset country style
+            d3.select(this)
+              .style('fill', d => countryData ? colorScale(countryData.civil_liberties_score) : '#e4e4e4')
+              .style('cursor', 'default')
+              .style('stroke-width', '0.5px');
+
+            // Hide tooltip
+            tooltip.style('visibility', 'hidden');
+          })
+          .on('click', function(event, d) {
+            const countryCode = d.properties.ISO2;
+            if (civilLibertiesData[countryCode]) {
+              const countryData = civilLibertiesData[countryCode];
+              const rating = getCivilLibertiesDescription(countryData.civil_liberties_score);
+              
+              // Update modal content
+              const modalContent = `
+                <div class="row">
+                  <div class="col-md-12 mb-4">
+                    <h4 class="country-title">${countryData.country_name}</h4>
+                    <div class="score-container">
+                      <div class="overall-score">
+                        <h5>Overall Civil Liberties Score</h5>
+                        <div class="score-circle" style="background-color: ${getColor(countryData.civil_liberties_score)}">
+                          <span class="score-value">${countryData.civil_liberties_score}</span>
+                          <span class="score-max">/60</span>
+                        </div>
+                        <p class="rating-text mt-2">${rating} Rating</p>
+                      </div>
+                    </div>
+                    <div class="progress mb-3">
+                      <div class="progress-bar" role="progressbar" 
+                           style="width: ${(countryData.civil_liberties_score/60)*100}%; background-color: ${getColor(countryData.civil_liberties_score)}" 
+                           aria-valuenow="${countryData.civil_liberties_score}" aria-valuemin="0" aria-valuemax="60">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-12">
+                    <div id="pieChart"></div>
+                  </div>
+                </div>
+              `;
+              
+              $('.modal-body').html(modalContent);
+              $('#countryDetailsModal').modal('show');
+              
+              // Create pie chart after modal is shown
+              $('#countryDetailsModal').on('shown.bs.modal', function () {
+                createPieChart(countryData);
+              });
+            }
+          });
+
+        // Add zoom capabilities
+        const zoom = d3.zoom()
+          .scaleExtent([1, 8])
+          .on('zoom', function(event) {
+            g.attr('transform', event.transform);
+          });
+
+        svg.call(zoom);
+        
+        // Hide loading spinner
+        $('#map-loading').hide();
+      })
+      .catch(function(error) {
+        console.error('Error loading the map:', error);
+        $('#map-loading').html('<p class="text-danger">Error loading the map</p>');
+      });
+  });
+</script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/chart-styles.css') }}">
+</head>
+{% endblock %}
