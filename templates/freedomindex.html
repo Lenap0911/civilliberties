@@ -154,3 +154,22 @@ def calculate():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+{% extends "layout.html" %}
+
+{% block title %}Freedom Compass{% endblock %}
+
+{% block content %}
+<div class="content-section">
+    <div class="page-header" id="overview">
+        <h1>Freedom Compass</h1>
+        <p class="lead">Find countries that align with your values using our interactive Freedom Compass. By selecting your priorities within the Personal Autonomy and Individual Rights categories (e.g., emphasizing social freedoms or economic opportunity), the tool generates a tailored list of top-matched nations based on Freedom House's data. Explore how countries compare on the issues that matter most to you.</p>
+    </div>
+
+    <div id="results" class="mt-5" style="display:none;">
+        <h3>Top Matches</h3>
+        <div id="results-content"></div>
+    </div>
+</div>
+{% endblock %}
