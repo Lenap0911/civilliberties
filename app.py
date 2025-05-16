@@ -143,7 +143,7 @@ def trust():
 @app.route('/freedomindex')
 def freedomindex():
     """Render the freedom compass page."""
-    return render_template('freedom_compass.html')
+    return render_template('freedomindex.html')
 
 @app.route('/calculate', methods=['POST'])
 def calculate_freedom_match():
@@ -275,36 +275,58 @@ def calculate_freedom_match():
 def isyour():
     """Render the country analysis page."""
     try:
-        # Read FIW data, skipping the first few rows until we find the header
-        with open('data/FIW2024.csv', 'r', encoding='utf-8') as f:
-            lines = f.readlines()
-            
-        # Find the header row
-        header_row = 0
-        for i, line in enumerate(lines):
-            if 'Country' in line and 'Edition' in line:
-                header_row = i
-                break
+        # Get EU countries directly from the database
+        conn = get_db_connection()
+        data = conn.execute('''
+            SELECT DISTINCT c.country_name
+            FROM countries c
+            WHERE c.country_code IN (
+                'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR',
+                'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL',
+                'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE'
+            )
+            ORDER BY c.country_name
+        ''').fetchall()
         
-        # Create a DataFrame from the data after the header
-        data_rows = []
-        columns = [col.strip().strip('"') for col in lines[header_row].split(';')]
-        
-        for line in lines[header_row + 1:]:
-            if line.strip():  # Skip empty lines
-                values = [val.strip().strip('"') for val in line.split(';')]
-                if len(values) == len(columns):  # Only add rows with correct number of columns
-                    data_rows.append(values)
-        
-        df = pd.DataFrame(data_rows, columns=columns)
-        
-        # Get unique EU countries
-        eu_countries = sorted(list(EU_COUNTRIES.values()))
+        eu_countries = [row['country_name'] for row in data]
+        conn.close()
         return render_template('isyour.html', countries=eu_countries)
     except Exception as e:
         print(f"Error reading data: {e}")
         return render_template('isyour.html', countries=[])
 
+@app.route('/get_country_history')
+def get_country_history():
+    """Get historical civil liberties data for a specific country."""
+    try:
+        country = request.args.get('country')
+        if not country:
+            return jsonify({'error': 'Country parameter is required'})
+
+        conn = get_db_connection()
+        data = conn.execute('''
+            SELECT 
+                f.year,
+                f.civil_liberties_score
+            FROM countries c
+            JOIN freedom_scores f ON c.country_id = f.country_id
+            WHERE c.country_name = ?
+            AND f.year BETWEEN 2013 AND 2024
+            ORDER BY f.year
+        ''', [country]).fetchall()
+        
+        conn.close()
+
+        if not data:
+            return jsonify({'error': 'No data found for the specified country'})
+
+        return jsonify({
+            'data': [{'year': row['year'], 'civil_liberties_score': row['civil_liberties_score']} for row in data]
+        })
+
+    except Exception as e:
+        print(f"Error fetching country history: {e}")
+        return jsonify({'error': 'Failed to fetch country data'})
 
 # Error handlers
 @app.errorhandler(404)

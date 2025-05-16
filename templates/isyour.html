@@ -6,7 +6,7 @@
 <div class="content-section">
   <div class="page-header" id="overview">
     <h1>Your Country's Freedom Journey</h1>
-    <p class="lead">Analyze how civil liberties have evolved in your country from 2013 to 2025</p>
+    <p class="lead">Analyze how civil liberties have evolved in your country from 2013 to 2024</p>
   </div>
 
   <div class="row">
@@ -87,12 +87,150 @@
           <p class="text-muted"><small>Data source: Freedom House - Freedom in the World 2024</small></p>
         </div>
       </div>
+
+      <!-- Freedom Compass Section -->
+      <div class="card mt-4">
+        <div class="card-body">
+          <h3>Freedom Compass</h3>
+          <p class="lead">Find countries that align with your values using our interactive Freedom Compass.</p>
+          
+          <form id="freedom-weights-form">
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                <div class="slider-container">
+                  <label class="form-label fw-bold">Freedom of Movement</label>
+                  <p class="text-muted small">The right to travel freely within a country, to leave and return to a country</p>
+                  <input type="range" class="form-range" id="weight1" name="weight1" min="0" max="100" value="25">
+                  <div class="slider-labels">
+                    <span>Not Important</span>
+                    <span>Very Important</span>
+                  </div>
+                  <div class="text-center">
+                    <span class="badge bg-primary" id="weight1-value">25%</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 mb-4">
+                <div class="slider-container">
+                  <label class="form-label fw-bold">Property Rights</label>
+                  <p class="text-muted small">The right to own property and establish businesses without undue interference</p>
+                  <input type="range" class="form-range" id="weight2" name="weight2" min="0" max="100" value="25">
+                  <div class="slider-labels">
+                    <span>Not Important</span>
+                    <span>Very Important</span>
+                  </div>
+                  <div class="text-center">
+                    <span class="badge bg-primary" id="weight2-value">25%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                <div class="slider-container">
+                  <label class="form-label fw-bold">Social Freedoms</label>
+                  <p class="text-muted small">Personal social freedoms including choice of marriage partners and family size</p>
+                  <input type="range" class="form-range" id="weight3" name="weight3" min="0" max="100" value="25">
+                  <div class="slider-labels">
+                    <span>Not Important</span>
+                    <span>Very Important</span>
+                  </div>
+                  <div class="text-center">
+                    <span class="badge bg-primary" id="weight3-value">25%</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 mb-4">
+                <div class="slider-container">
+                  <label class="form-label fw-bold">Equality of Opportunity</label>
+                  <p class="text-muted small">Equal opportunities and freedom from economic exploitation</p>
+                  <input type="range" class="form-range" id="weight4" name="weight4" min="0" max="100" value="25">
+                  <div class="slider-labels">
+                    <span>Not Important</span>
+                    <span>Very Important</span>
+                  </div>
+                  <div class="text-center">
+                    <span class="badge bg-primary" id="weight4-value">25%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="text-center mt-4">
+              <button type="submit" class="btn btn-primary btn-lg px-5">Find My Matches</button>
+            </div>
+          </form>
+          
+          <div class="loading mt-4" id="loading">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Finding your best country matches...</p>
+          </div>
+          
+          <div id="calc-summary" class="mb-4" style="display:none;"></div>
+          <div id="results" class="mt-5" style="display:none;">
+            <h3 class="text-center mb-4">Your Top Country Matches</h3>
+            <div class="row" id="results-content"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Add Plotly.js -->
+<!-- Add required scripts -->
 <script src="https://cdn.plot.ly/plotly-2.29.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+.slider-container {
+    margin-bottom: 2rem;
+}
+.slider-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+.result-card {
+    transition: all 0.3s ease;
+}
+.result-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+.freedom-score {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: bold;
+    margin-right: 10px;
+}
+.score-1 { background-color: #f8d7da; color: #842029; }
+.score-2 { background-color: #f8d7da; color: #842029; }
+.score-3 { background-color: #fff3cd; color: #664d03; }
+.score-4 { background-color: #d1e7dd; color: #0f5132; }
+.score-5 { background-color: #d1e7dd; color: #0f5132; }
+.loading {
+    display: none;
+    text-align: center;
+    margin: 2rem 0;
+}
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+.chart-container {
+    height: 200px;
+    margin-bottom: 1rem;
+}
+</style>
 
 <script>
 document.getElementById('country-search-form').addEventListener('submit', function(e) {
@@ -181,6 +319,9 @@ function displayScore(score) {
 }
 
 function createTimeSeriesChart(data, country) {
+  // Sort data by year to ensure proper line connection
+  data.sort((a, b) => a.year - b.year);
+  
   const years = data.map(d => d.year);
   const scores = data.map(d => d.civil_liberties_score);
 
@@ -192,32 +333,51 @@ function createTimeSeriesChart(data, country) {
     name: 'Civil Liberties Score',
     line: {
       color: '#3498db',
-      width: 3
+      width: 2,
+      shape: 'linear'
     },
     marker: {
       size: 8,
-      color: '#3498db'
-    }
+      color: '#3498db',
+      symbol: 'circle',
+      line: {
+        color: '#ffffff',
+        width: 1
+      }
+    },
+    text: scores.map(score => score.toFixed(1)),
+    textposition: 'top center',
+    hoverinfo: 'x+y',
+    hovertemplate: '<b>Year:</b> %{x}<br><b>Score:</b> %{y:.1f}<extra></extra>'
   };
 
   const layout = {
     title: {
-      text: `Civil Liberties Score Evolution: ${country}`,
+      text: `Civil Liberties Score Evolution: ${country} (2013-2024)`,
       font: { size: 20 }
     },
     xaxis: {
       title: 'Year',
       tickmode: 'linear',
-      dtick: 1
+      dtick: 1,
+      range: [2013, 2024],
+      tickformat: 'd',
+      gridcolor: '#e0e0e0',
+      showgrid: true
     },
     yaxis: {
       title: 'Civil Liberties Score (0-60)',
-      range: [0, 60]
+      range: [0, 60],
+      gridcolor: '#e0e0e0',
+      tickmode: 'linear',
+      dtick: 10,
+      showgrid: true
     },
     showlegend: false,
-    hovermode: 'x unified',
-    plot_bgcolor: '#f8f9fa',
-    paper_bgcolor: '#ffffff'
+    hovermode: 'closest',
+    plot_bgcolor: '#ffffff',
+    paper_bgcolor: '#ffffff',
+    margin: { t: 50, r: 30, b: 50, l: 60 }
   };
 
   const config = {
@@ -248,6 +408,172 @@ function fetchCountryData(country) {
       showError('Failed to fetch data. Please try again.');
     });
 }
+// Add Freedom Compass functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Update slider value displays
+    const sliders = ['weight1', 'weight2', 'weight3', 'weight4'];
+    sliders.forEach(slider => {
+        const input = document.getElementById(slider);
+        const valueDisplay = document.getElementById(`${slider}-value`);
+        
+        input.addEventListener('input', function() {
+            valueDisplay.textContent = `${this.value}%`;
+        });
+    });
+    
+    // Form submission
+    document.getElementById('freedom-weights-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('results').style.display = 'none';
+        
+        const weights = {
+            weight1: parseInt(document.getElementById('weight1').value),
+            weight2: parseInt(document.getElementById('weight2').value),
+            weight3: parseInt(document.getElementById('weight3').value),
+            weight4: parseInt(document.getElementById('weight4').value)
+        };
+
+        try {
+            const res = await fetch('/calculate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(weights)
+            });
+
+            const data = await res.json();
+            const resultsDiv = document.getElementById('results');
+            const content = document.getElementById('results-content');
+            const summaryDiv = document.getElementById('calc-summary');
+
+            if (data.error) {
+                content.innerHTML = '<div class="col-12"><div class="alert alert-danger">' + data.error + '</div></div>';
+                summaryDiv.style.display = 'none';
+            } else {
+                summaryDiv.innerHTML = `
+                    <div class="card card-body bg-light border mb-3">
+                        <h5 class="mb-2">Your Calculation</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Input Values (0-100):</strong>
+                                <ul class="mb-2">
+                                    <li>Freedom of Movement: <span class="badge bg-secondary">${data.user_input.movement}</span></li>
+                                    <li>Property Rights: <span class="badge bg-secondary">${data.user_input.property}</span></li>
+                                    <li>Social Freedoms: <span class="badge bg-secondary">${data.user_input.social}</span></li>
+                                    <li>Equality: <span class="badge bg-secondary">${data.user_input.equality}</span></li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Scaled for Matching (0-4):</strong>
+                                <ul class="mb-2">
+                                    <li>Freedom of Movement: <span class="badge bg-info">${data.user_scaled.movement}</span></li>
+                                    <li>Property Rights: <span class="badge bg-info">${data.user_scaled.property}</span></li>
+                                    <li>Social Freedoms: <span class="badge bg-info">${data.user_scaled.social}</span></li>
+                                    <li>Equality: <span class="badge bg-info">${data.user_scaled.equality}</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                summaryDiv.style.display = 'block';
+
+                content.innerHTML = data.matches.map((m, index) =>
+                    `<div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card result-card h-100 ${index === 0 ? 'border-primary' : ''}">
+                            <div class="card-header bg-${index === 0 ? 'primary text-white' : 'light'}">
+                                <h5 class="mb-0">${m.country} ${index === 0 ? '<span class="badge bg-warning text-dark ms-2">Best Match</span>' : ''}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span>Match Score:</span>
+                                    <span class="badge bg-${getMatchColor(m.match_percentage)}">${m.match_percentage}%</span>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="chart-${index}"></canvas>
+                                </div>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Freedom of Movement
+                                        <span class="freedom-score score-${Math.round(m.scores.movement)}">${m.scores.movement}</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Property Rights
+                                        <span class="freedom-score score-${Math.round(m.scores.property)}">${m.scores.property}</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Social Freedoms
+                                        <span class="freedom-score score-${Math.round(m.scores.social)}">${m.scores.social}</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Equality
+                                        <span class="freedom-score score-${Math.round(m.scores.equality)}">${m.scores.equality}</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>`
+                ).join('');
+                
+                // Create radar charts
+                data.matches.forEach((m, index) => {
+                    const ctx = document.getElementById(`chart-${index}`).getContext('2d');
+                    new Chart(ctx, {
+                        type: 'radar',
+                        data: {
+                            labels: ['Movement', 'Property', 'Social', 'Equality'],
+                            datasets: [{
+                                label: 'Freedom Scores',
+                                data: [m.scores.movement, m.scores.property, m.scores.social, m.scores.equality],
+                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                borderColor: 'rgb(54, 162, 235)',
+                                pointBackgroundColor: 'rgb(54, 162, 235)',
+                                pointBorderColor: '#fff',
+                                pointHoverBackgroundColor: '#fff',
+                                pointHoverBorderColor: 'rgb(54, 162, 235)'
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                r: {
+                                    angleLines: {
+                                        display: true
+                                    },
+                                    suggestedMin: 0,
+                                    suggestedMax: 4
+                                }
+                            },
+                            maintainAspectRatio: false
+                        }
+                    });
+                });
+            }
+            
+            // Hide loading indicator and show results
+            document.getElementById('loading').style.display = 'none';
+            resultsDiv.style.display = 'block';
+            
+            // Scroll to results
+            resultsDiv.scrollIntoView({ behavior: 'smooth' });
+            
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('results-content').innerHTML = 
+                '<div class="col-12"><div class="alert alert-danger">An error occurred while processing your request. Please try again.</div></div>';
+            document.getElementById('results').style.display = 'block';
+        }
+    });
+    
+    // Helper function to determine badge color based on match percentage
+    function getMatchColor(percentage) {
+        if (percentage >= 90) return 'success';
+        if (percentage >= 70) return 'info';
+        if (percentage >= 50) return 'primary';
+        if (percentage >= 30) return 'warning';
+        return 'danger';
+    }
+});
 </script>
 {% endblock %}
 
