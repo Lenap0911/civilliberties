@@ -142,10 +142,134 @@ def trust():
 
 @app.route('/freedomindex')
 def freedomindex():
-    """Render the freedom index builder page."""
-    return render_template('freedomindex.html')
+    """Render the freedom compass page."""
+    return render_template('freedom_compass.html')
 
+@app.route('/calculate', methods=['POST'])
+def calculate_freedom_match():
+    """Calculate freedom index matches based on user ideal profile (distance)."""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Invalid input."}), 400
 
+        # User input: 0-100 scale, convert to 0-4 scale
+        def scale_to_four(val):
+            try:
+                v = float(val)
+                return max(0, min(4, round(v / 25)))  # 0-24=0, 25-49=1, 50-74=2, 75-99=3, 100=4
+            except Exception:
+                return 0
+
+        # User weights as 0-1 scale for weighting distance
+        user_weights = [
+            max(0, min(1, float(data.get('weight1', 25)) / 100)),
+            max(0, min(1, float(data.get('weight2', 25)) / 100)),
+            max(0, min(1, float(data.get('weight3', 25)) / 100)),
+            max(0, min(1, float(data.get('weight4', 25)) / 100)),
+        ]
+        user_profile = [
+            scale_to_four(data.get('weight1', 25)),
+            scale_to_four(data.get('weight2', 25)),
+            scale_to_four(data.get('weight3', 25)),
+            scale_to_four(data.get('weight4', 25)),
+        ]
+
+        # Load FIW2024.csv data
+        try:
+            csv_path = Path('data/FIW2024.csv')
+            if not csv_path.exists():
+                return jsonify({"error": "Freedom index data not found."}), 500
+
+            with open(csv_path, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+            header_row = 0
+            for i, line in enumerate(lines):
+                if 'Country/Territory' in line and 'Edition' in line:
+                    header_row = i
+                    break
+            data_rows = []
+            columns = [col.strip().strip('"') for col in lines[header_row].split(';')]
+            for line in lines[header_row + 1:]:
+                if line.strip():
+                    values = [val.strip().strip('"') for val in line.split(';')]
+                    if len(values) == len(columns):
+                        data_rows.append(values)
+            df = pd.DataFrame(data_rows, columns=columns)
+
+            eu_country_names = set(EU_COUNTRIES.values())
+            df = df[(df["Edition"] == "2024") & (df["Country/Territory"].isin(eu_country_names))]
+            if df.empty:
+                return jsonify({"error": "No matching data found for EU countries in 2024."}), 404
+
+            required_cols = ["G1", "G2", "G3", "G4"]
+            for col in required_cols:
+                if col not in df.columns:
+                    return jsonify({"error": f"Missing column {col} in CSV data."}), 500
+                df[col] = pd.to_numeric(df[col], errors='coerce')
+
+            # Compute weighted Euclidean distance to user profile
+            def weighted_distance(row):
+                num = 0.0
+                denom = 0.0
+                for i, c in enumerate(["G1", "G2", "G3", "G4"]):
+                    w = user_weights[i]
+                    if pd.isna(row[c]):
+                        continue  # skip missing data
+                    num += w * (user_profile[i] - row[c]) ** 2
+                    denom += w
+                # If all weights are zero or all missing, treat as max distance
+                if denom == 0:
+                    return float('inf')
+                return (num / denom) ** 0.5
+            df["distance"] = df.apply(weighted_distance, axis=1)
+            top = df.sort_values("distance").head(3)
+            min_dist = top["distance"].min()
+            max_dist = top["distance"].max()
+
+            # For display, convert distance to a match percentage (closer = higher)
+            def dist_to_match(dist):
+                # If all distances are the same, just return 100
+                if max_dist == min_dist:
+                    return 100.0
+                # Otherwise, invert and scale
+                return round(100 * (1 - (dist - min_dist) / (max_dist - min_dist)), 1)
+
+            results = []
+            for _, row in top.iterrows():
+                results.append({
+                    "country": row["Country/Territory"],
+                    "match_percentage": dist_to_match(row["distance"]),
+                    "scores": {
+                        "movement": float(row["G1"]),
+                        "property": float(row["G2"]),
+                        "social": float(row["G3"]),
+                        "equality": float(row["G4"])
+                    }
+                })
+            return jsonify({
+                "matches": results,
+                "user_input": {
+                    "movement": data.get('weight1', 25),
+                    "property": data.get('weight2', 25),
+                    "social": data.get('weight3', 25),
+                    "equality": data.get('weight4', 25)
+                },
+                "user_scaled": {
+                    "movement": user_profile[0],
+                    "property": user_profile[1],
+                    "social": user_profile[2],
+                    "equality": user_profile[3]
+                }
+            })
+
+        except Exception as e:
+            print(f"Error processing CSV data: {e}")
+            return jsonify({"error": f"Data processing error: {str(e)}"}), 500
+
+    except Exception as e:
+        print(f"Error in calculate_freedom_match: {e}")
+        return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
 
 @app.route('/isyour')
 def isyour():
